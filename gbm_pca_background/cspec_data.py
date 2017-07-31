@@ -4,9 +4,10 @@ import astropy.io.fits as fits
 
 import warnings
 
-from step_plot import slice_disjoint, step_plot
-from poly_fitting import polyfit
-from significance import Significance
+from gbm_pca_background.utils.step_plot import step_plot
+from gbm_pca_background.utils.poly_fitting import polyfit
+from gbm_pca_background.utils.significance import Significance
+from gbm_pca_background.utils.slice_disjoint import slice_disjoint
 
 class CSPECData(object):
     def __init__(self, cspec_file, postion_history=None):
@@ -53,7 +54,7 @@ class CSPECData(object):
 
         # extract all the intervals that had
         # no excess and a decent fit
-        self._extract_good()
+        self._extract_good_poly_intervals()
 
         # create the spectra
         self._create_spectra()
