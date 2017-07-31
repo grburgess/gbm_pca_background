@@ -25,12 +25,23 @@ class CSPECData(object):
             # spectrum extension
 
             spec_ext = f['SPECTRUM']
+            ebounds_ext = f['EBOUNDS']
 
+            
             self._exposure = spec_ext.data['EXPOSURE']
             self._start_times = spec_ext.data['TIME']
             self._stop_times = spec_ext.data['ENDTIME']
             self._counts = spec_ext.data['COUNTS']
+            emin = ebounds_ext.data['E_MIN']
+            emax = ebounds_ext.data['E_MAX']
 
+
+        self._ebounds = np.array(zip(emin,emax))
+
+        self._channel_widths = emax - emin
+        self._channel_centers = self._ebounds.mean(axis=1)
+
+        
         self._good_bkgs = []
 
         # create an array of total counts
@@ -59,6 +70,22 @@ class CSPECData(object):
         # create the spectra
         self._create_spectra()
 
+
+    @property
+    def spectra(self):
+
+        return self._spectra
+
+    @property
+    def channel_centers(self):
+
+        return self._channel_centers
+
+    @property
+    def channel_widths(self):
+
+        return self._channel_widths
+        
     def _break_up_intervals(self):
         """
         breaks up non-zero intervals into sets 
@@ -292,8 +319,10 @@ class CSPECData(object):
                         exposure += self._exposure[j + k]
                         spectrum += self._counts[j + k, :]
 
-                    self._spectra.append(spectrum)
+                    self._spectra.append(spectrum.tolist())
                     self._total_exposure.append(exposure)
+
+        self._spectra = np.array(self._spectra)
 
     def plot_all(self, show_bad=False, show_poly=False):
         """
